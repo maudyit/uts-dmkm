@@ -1,0 +1,61 @@
+---
+title: ''
+author: "221810414 - Maudy Insan Tania"
+date: "10/27/2020"
+output: word_document
+---
+
+```{r}
+#input dan perapihan dataset
+data <- read.csv("dataset.csv", sep = ";")
+cn <- c("ID","Motorway", "SR", "NR", "TR", "VR", "SUR1", "SUR2","SUR3", "UR", "FR",
+        "OR", "RR", "BR", "MR", "CR", "Green_frogs", "Brown_frogs", "Common_toad",
+        "Fire-bellied toad", "Tree_frog", "Common_newt", "Great crested newt")
+colnames(data) = cn
+data <- data[2:190,]
+data <- data[,1:17]
+
+dim(data)
+data <- as.data.frame(data)
+```
+
+```{r}
+data[,1] <- as.numeric(data[,1])
+data$SR <- as.numeric(data$SR)
+data$NR <- as.numeric(data$NR)
+data$OR <- as.numeric(data$OR)
+
+str(data)
+```
+
+
+```{r}
+#Pembuatan train set dan test set
+set.seed(1234)
+sampel <- sample(2, nrow(data), replace = T, prob = c(0.8,0.2))
+trainingdat <- data[sampel==1, ]
+testingdat <- data[sampel==2, ]
+print(paste("Jumlah Training set: ", nrow(trainingdat), "| Jumlah Testing Data: ", nrow(testingdat)))
+
+```
+```{r}
+#membuat model naive bayes
+
+
+library(naivebayes)
+library(psych)
+library(caret)
+suppressWarnings(suppressMessages(library(naivebayes)))
+nb <- naive_bayes(Green_frogs~.,data=trainingdat, laplace = 1)
+nb
+```
+```{r}
+summary(nb)
+```
+
+```{r}
+#confusion matrix
+prediksi <- predict(nb, testingdat)
+confusionMatrix(table(prediksi,testingdat$Green_frogs))
+```
+
